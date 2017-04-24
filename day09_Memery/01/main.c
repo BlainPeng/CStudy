@@ -1,7 +1,21 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+
+
+void note1() {
+
+    /**a和a1都是一个数组，有4个成员，初始化第一个是字符a，最后一个是字符'\n'*/
+    char a[4] = {'a', 'b', 'c', '\0'};
+    char a1[] = "abc";
+    /**定义了一个常量指针变量，指向常量abc的地址，abc存在于常量区*/
+    const char *p = "abc";
+    a[0] = 'd';/**可以改变数组下标0成员的值*/
+//    p[0] = 'd'; /**p指向了一个常量，常量的值是不可改变的*/
+}
 
 /**
- *
+ * 把一个int的每个字节单独设置成一个值
  */
 
 void study1() {
@@ -12,10 +26,16 @@ void study1() {
     p[1] = 2;
     p[2] = 3;
     p[3] = 4;
+    /**打印结果：04030201  小端对齐*/
+    printf("%08x\n", a);    // 08指定数据的最小输出位数为8，若不够8位，则补零，若大于8位，则按照原位数输出；
 }
 
 /**全局变量，作用域是整个文件*/
 int a = 10;
+/**
+ * 使用外部文件的变量或函数时，需要使用extern关键字来进行声明
+ */
+extern int abc;
 
 void test() {
     /**
@@ -47,10 +67,80 @@ void test() {
     register int c = 0;
 }
 
+void test1(int n) {
+
+    /**
+     * 这里若是去掉这个条件的话，这个递归会导致程序崩溃；
+     * 原因是栈的大小受到操作系统的限制，一般是k为单位的，
+     * 如果超出了栈最大限制，栈就会溢出，那么程序就会崩溃。
+     *
+     * 64位ubuntu下，默认栈大小是132k，不是所有的系统栈大
+     * 小都是一样，不过至少单位是k
+     */
+    if (n > 10)
+        test1(n + 1);
+}
+
+void test2() {
+
+    int a = 0;
+    /**栈里面的一个指针变量p指向了一个变量a的地址*/
+    int *p = &a;
+    *p = 10;
+    printf("%d\n", a);
+    /**在堆内存中分配了4个字节的空间*/
+    p = malloc(sizeof(int));
+    /**通过指针p间接的访问这块用malloc分配的堆内存*/
+    *p = 100;
+    printf("%d\n", *p);
+    free(p);
+}
+
+void modify(char *s) {
+
+    s[0] = 'a';
+}
+
+void test3() {
+
+    /**
+     * calloc与malloc类似，负责在堆中分配内存
+     * malloc只分配，但不负责清理内存；
+     * calloc分配内存的同时把内存清空
+     */
+    char *p = calloc(100, sizeof(char));
+    strcpy(p, "Hello World");
+    modify(p);
+    printf("%s \n", p);
+    free(p);
+}
+
+void test4(char *p) {
+
+    p = calloc(100, sizeof(char));
+    strcpy(p, "Hello World");
+    p[0] = 'a';
+}
+
+
 int main() {
 
-    for (int i = 0; i < 10; ++i) {
-        test();
-    }
+
+//    note1();
+
+//    study1();
+
+//    for (int i = 0; i < 10; ++i) {
+//        test();
+//    }
+
+//    printf("%d", abc);
+
+//    test2();
+//    test3();
+
+    char *p = NULL;
+    test4(p);
+    printf("%s\n", p);
     return 0;
 }
