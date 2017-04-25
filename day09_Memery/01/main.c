@@ -122,6 +122,50 @@ void test4(char *p) {
     p[0] = 'a';
 }
 
+void test5(char **s) {
+
+    *s = calloc(100, sizeof(char));
+    strcpy(*s, "Hello World");
+    (*s)[0] = 'a';
+
+}
+
+void test6() {
+
+    char *p = calloc(100, sizeof(char));
+    *p = 'a';
+    p++;
+    *p = 'b';
+    p++;
+    *p = 'c';
+    /**
+     * 在释放指针之前，需确保指针的开始位置
+     * 当两个p++后，相当于p+=2，指针指向的位
+     * 置已经向下偏移了2个char，若此时去释放
+     * 这个指针，会从这个最新的位置开始释放，
+     * 所以会导致多释放2个char并未被申请
+     * 的内存，从而程序崩溃，所以，必须
+     * 把指针归位
+     */
+    p -= 2;
+    free(p);
+
+}
+
+void test7() {
+
+    char *p = malloc(100);
+    /**在已有的堆内存基础上增加内存100*/
+    char *p1 = realloc(p, 200);
+    if (p == p1) {
+        printf("相同内存基础上扩展\n");
+    } else {
+        printf("重新分配\n");
+    }
+    /**不要free p 因为realloc自动维护了p的空间*/
+    free(p1);
+}
+
 
 int main() {
 
@@ -139,8 +183,20 @@ int main() {
 //    test2();
 //    test3();
 
-    char *p = NULL;
-    test4(p);
-    printf("%s\n", p);
+
+//    char *p = NULL;
+    /**
+     * 将p传入到函数test4中，虽然在test4函数中给p申请了内存并赋了值，
+     * 但那只改变了形参，对实参没有影响，除非如函数test5那样
+     */
+//    test4(p);
+//    printf("%s\n", p);
+//    char *p1 = NULL;
+//    test5(&p1);
+//    printf("%s\n", p1);
+//    free(p1);
+
+//    test6();
+    test7();
     return 0;
 }
