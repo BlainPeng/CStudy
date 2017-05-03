@@ -162,8 +162,81 @@ void test7() {
     } else {
         printf("重新分配\n");
     }
-    /**不要free p 因为realloc自动维护了p的空间*/
+    /**不要free p 因为realloc自动维护了p的空间,详见realloc.png*/
     free(p1);
+}
+
+/**
+ * 动态分配堆内存
+ * 详细见图：dinamic_memory.png
+ */
+void test8() {
+
+    /**
+     * step 1 定义一个指针来保存用户输入信息
+     * 这个为什么不用char p [][]？因为二维数
+     * 组的长度我们并不能确定，所以可以用一个指
+     * 针，p相当于指向了 char *a[]的一个数组
+     */
+    char **p = NULL;
+    int index = 0;
+    while (1) {
+
+        /**step 2 定义临时变量记录用户每次输入的内容*/
+        char temp[2048] = {0};
+        scanf("%s", temp);
+        /**step 3 添加退出死循环条件*/
+        if (strcmp(temp, "exit") == 0)
+            break;
+        /**step 4 申请一块堆内存，并保存栈内变量的内容*/
+        char *name = calloc(sizeof(temp) + 1, sizeof(char));
+        strcpy(name, temp);
+        /**step 5 动态申请保存每次输入内容的堆内存地址*/
+        p = realloc(p, sizeof(char *) * (index + 1));
+        p[index] = name;
+        index++;
+    }
+
+    int i;
+    for (i = 0; i < index; i++) {
+
+        printf("%s\n", p[i]);
+    }
+
+    for (i = 0; i < index; i++) {
+
+        /**先释放数组成员指向的堆内存*/
+        free(p[i]);
+    }
+
+    /**再释放堆中的char *数组*/
+    free(p);
+
+}
+
+void test9(char *s) {
+
+    s[0] = 'a';
+}
+
+void test10(char *s) {
+
+    s = calloc(100, sizeof(char));
+    strcpy(s, "Hello World");
+    s[0] = 'a';
+}
+
+void test11(char **s) {
+
+    *s = calloc(100, sizeof(char));
+    strcpy(*s, "Hello World");
+    (*s)[0] = 'a';
+}
+
+char *test12() {
+
+    char a[] = "Hello World";
+    return a;
 }
 
 
@@ -184,11 +257,12 @@ int main() {
 //    test3();
 
 
-//    char *p = NULL;
     /**
      * 将p传入到函数test4中，虽然在test4函数中给p申请了内存并赋了值，
-     * 但那只改变了形参，对实参没有影响，除非如函数test5那样
+     * 但那只改变了形参，对实参没有影响，除非如函数test5那样，详见图
+     * args_heap.png
      */
+//    char *p = NULL;
 //    test4(p);
 //    printf("%s\n", p);
 //    char *p1 = NULL;
@@ -197,6 +271,30 @@ int main() {
 //    free(p1);
 
 //    test6();
-    test7();
+//    test7();
+//    test8();
+
+//    char *p = calloc(100, sizeof(char));
+//    strcpy(p, "Hello World");
+//    test9(p);
+//    printf("%s\n", p);//这里是可以修改成功的
+//    free(p);
+
+    /**
+     * 调用函数test10后，p仍然是NULL，因为在函数中给形参变量重新
+     * 申请内存空间，但是当函数结束后，这块内存空间就不存在了，所以
+     * 实参还是没有成功的申请内存空间，要想成功的话，请看函数test11
+     */
+//    char *p = NULL;
+////    test10(p);
+//    test11(&p);
+//    printf("%s\n", p);
+//    free(p);
+
+    /**函数test12结束后，内容清空，返回回来无意义*/
+    char *p = test12();
+    printf("%s\n", p);
+
+
     return 0;
 }
