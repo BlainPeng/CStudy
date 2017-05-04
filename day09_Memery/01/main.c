@@ -239,6 +239,32 @@ char *test12() {
     return a;
 }
 
+char *test13() {
+
+    char *a = calloc(20, sizeof(char));
+    strcpy(a, "Hello World!");
+    return a;
+
+}
+
+char *test14() {
+
+    char *a = "Hello World!";
+    return a;
+}
+
+char *test15() {
+
+    const char a[] = "test15";
+    return (char *) a;
+}
+
+char *test16() {
+
+    static char a[] = "Hello World";
+    return a;
+}
+
 
 int main() {
 
@@ -292,7 +318,20 @@ int main() {
 //    free(p);
 
     /**函数test12结束后，内容清空，返回回来无意义*/
-    char *p = test12();
+//    char *p = test12();
+    /**函数有效：申请了堆内存，函数结束对堆内存无影响*/
+//    char *p = test13();
+    /**函数有效：返回回来的指针直接指向常量区的字符串*/
+//    char *p = test14();
+    /**
+     * 函数在windows系无效：和函数test12是一样，
+     * 因为const并不是真正意义上的常量，只是从语法上来讲是常量。
+     * 不知道为什么在Mac上可以打出来值
+     */
+//    char *p = test15();
+    /**函数有效：static变量在程序未结束之前一直存在*/
+    char *p = test16();
+
     printf("%s\n", p);
 
 
